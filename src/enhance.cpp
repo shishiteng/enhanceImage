@@ -105,6 +105,7 @@ int enhanceImage(Mat src, Mat &dst,ALGORITHM_TYPE algorithm)
     break;
   }
  
+  return 0;
 }
 
 int test_all(int argc, char *argv[])
