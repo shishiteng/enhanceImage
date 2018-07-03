@@ -14,7 +14,7 @@ include_directories(
 
 
 # library
-add_library(enhanceImage STATIC
+add_library(enhanceImage SHARED
   src/enhance.cpp
 )
 target_link_libraries(enhanceImage
@@ -31,6 +31,7 @@ target_link_libraries(test
 	
 add_dependencies(test enhanceImage)
 
-INSTALL(TARGETS enhanceImage ARCHIVE DESTINATION lib)
+INSTALL(TARGETS enhanceImage LIBRARY DESTINATION lib)
 INSTALL(DIRECTORY include DESTINATION .)
 INSTALL(FILES src/test.cpp DESTINATION example)
+INSTALL(FILES readme.txt DESTINATION .)
