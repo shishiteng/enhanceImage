@@ -1,20 +1,36 @@
 cmake_minimum_required(VERSION 2.6)
-project(imageEnhance)
+project(enhanceImage)
 
-#add_definitions(-DSHOW_DEBUG_IMAGES)
+set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g")
 
-find_package(OpenCV REQUIRED )
+find_package(OpenCV 3 REQUIRED )
 
-include_directories(${OpenCV_INCLUDE_DIR})
-link_directories(${OpenCV_LIBRARY_DIR})
-
-
-add_executable(enhance
-./src/enhance.cpp
+include_directories(
+  include
+  ${OpenCV_INCLUDE_DIR}
 )
 
-target_link_libraries(enhance
+
+# library
+add_library(enhanceImage STATIC
+  src/enhance.cpp
+)
+target_link_libraries(enhanceImage
   ${OpenCV_LIBRARIES}
 )
 
+# exe
+add_executable(test
+  src/test.cpp)
+target_link_libraries(test
+  ${OpenCV_LIBRARIES}
+  enhanceImage
+)
+	
+add_dependencies(test enhanceImage)
 
+INSTALL(TARGETS enhanceImage ARCHIVE DESTINATION lib)
+INSTALL(DIRECTORY include DESTINATION .)
+INSTALL(FILES src/test.cpp DESTINATION example)

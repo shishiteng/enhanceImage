@@ -1,5 +1,6 @@
 #include <opencv2/opencv.hpp>
 #include <string.h>
+#include "enhance.h"
 
 using namespace std;
 using namespace cv;
@@ -58,8 +59,55 @@ void Gamma(Mat src, Mat &dst, float y=3.0)
   dst = imageGamma.clone();
 }
 
+//过度曝光测试
+void ExposureOver(Mat src, Mat &dst)
+{
+  Mat imageOver(src.size(),CV_8UC1);
+  for (int i = 0; i < src.rows; i++) {
+    for (int j = 0; j < src.cols; j++) {
+      unsigned char r = src.at<unsigned char>(i, j);
+      imageOver.at<unsigned char>(i, j)  = r > (255-r) ? (255-r) : r;
+    }
+  }
+  dst = imageOver.clone();
+}
 
-int main(int argc, char *argv[])
+int enhanceImage(Mat src, Mat &dst,ALGORITHM_TYPE algorithm)
+{
+
+  if(src.empty()) {
+    printf("[enhance] input image is empty\n");
+    return -1;
+  }
+
+  Mat image(src.size(),CV_8UC1);
+  if(src.type() != CV_8UC1) {
+    cvtColor(src,image,CV_BGR2GRAY);
+  }else {
+    image = src;
+  }
+  
+  switch(algorithm) {
+  case LOG:
+    Log(image,dst);
+    break;
+  case EQUALIZE:
+    Equalize(image,dst);
+    break;
+  case LAPLACE:
+    Laplace(image,dst);
+    break;
+  case GAMMA:
+    Gamma(image,dst);
+    break;
+  default:
+    Equalize(image,dst);
+    break;
+  }
+ 
+}
+
+int test_all(int argc, char *argv[])
 {
   string file;
   float v = 1.0;
@@ -83,18 +131,20 @@ int main(int argc, char *argv[])
     return -1;
   }
 
-  Mat imageLog,imageLaplace,imageGamma,imageEqualize;
+  Mat imageLog,imageLaplace,imageGamma,imageEqualize,imageExposure;
 
   Log(image,imageLog);
   Laplace(image,imageLaplace);
   Gamma(image,imageGamma,v);
   Equalize(image,imageEqualize);
+  ExposureOver(image,imageExposure);
 
   imshow("src", image);
   imshow("log", imageLog);
   imshow("lapace", imageLaplace);
   imshow("gamma", imageGamma);
   imshow("equlize", imageEqualize);
+  imshow("over exposure", imageExposure);
   
   waitKey();	
   return 0;
